@@ -5,58 +5,6 @@ import (
 	"strings"
 )
 
-type Room struct {
-	Game  *Game
-	Name  string
-	Items map[string]Item
-}
-
-type Item struct {
-	Name  string
-	Exist bool
-}
-
-type Object struct {
-	Name string
-	Lock bool
-}
-
-type Backpack struct {
-	Lock  bool
-	Items map[string]bool
-}
-
-type Player struct {
-	InRoom *Room
-	Bag    *Backpack
-}
-
-type Game struct {
-	Rooms   map[string]*Room
-	Players []Player
-}
-
-func (p *Player) Apply(o *Item) bool {
-	if o.Exist {
-		return false
-	} else {
-		return true
-	}
-}
-
-func (p *Player) View() string {
-	var obj string
-	for _, v := range p.InRoom.Items {
-		obj += v.Name + " "
-	}
-	return "ты находишься: " + p.InRoom.Name + ". " + "предметы: " + obj
-}
-
-func (p *Player) Go(nextRoom string) string {
-	p.InRoom = g.GetRoom(nextRoom)
-	return "Вы находитесь в " + nextRoom
-}
-
 func (g *Game) GetRoom(name string) *Room {
 	return g.Rooms[name]
 }
@@ -84,6 +32,9 @@ func main() {
 	} else {
 		fmt.Println("На вас не надет рюкзак")
 	}
+	fmt.Println(g.Players[0].Go("кухня"))
+	fmt.Println(g.Players[0].InRoom.WhereToGo())
+	fmt.Println(g.Players[0].Go("улица"))
 }
 
 func initGame() {
@@ -141,6 +92,15 @@ func initGame() {
 		{
 			InRoom: g.GetRoom("кухня"),
 		},
+	}
+
+	g.Ways = []Way{
+		{RoomFrom: g.GetRoom("кухня"), RoomTo: g.GetRoom("коридор")},
+		{RoomFrom: g.GetRoom("коридор"), RoomTo: g.GetRoom("кухня")},
+		{RoomFrom: g.GetRoom("коридор"), RoomTo: g.GetRoom("комната")},
+		{RoomFrom: g.GetRoom("комната"), RoomTo: g.GetRoom("коридор")},
+		{RoomFrom: g.GetRoom("коридор"), RoomTo: g.GetRoom("улица")},
+		{RoomFrom: g.GetRoom("улица"), RoomTo: g.GetRoom("коридор")},
 	}
 }
 
